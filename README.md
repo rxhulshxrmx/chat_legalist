@@ -1,28 +1,85 @@
-# Legal Information Backend
+# Legal Assistant Project
 
-A FastAPI-based backend service for retrieving and managing legal information from Indian Kanoon.
+A full-stack application for legal information retrieval and assistance.
+
+## Project Structure
+
+```
+.
+├── backend/           # FastAPI backend
+│   ├── main.py       # Main application file
+│   ├── legal_ner.py  # Legal NER implementation
+│   ├── ik_download.py # Indian Kanoon API integration
+│   └── requirements.txt
+│
+└── frontend/         # Next.js frontend
+    ├── app/         # Next.js app directory
+    ├── public/      # Static files
+    └── package.json # Frontend dependencies
+```
 
 ## Setup
 
-1. Create a virtual environment:
+### Backend Setup
+1. Navigate to the backend directory:
+```bash
+cd backend
+```
+
+2. Create a virtual environment:
 ```bash
 python -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 ```
 
-2. Install dependencies:
+3. Install dependencies:
 ```bash
 pip install -r requirements.txt
 ```
 
-## Running the Application
-
-To run the development server:
+4. Run the backend:
 ```bash
 uvicorn main:app --reload
 ```
 
-The API will be available at `http://localhost:8000`
+The backend will be available at `http://localhost:8000`
+
+### Frontend Setup
+1. Navigate to the frontend directory:
+```bash
+cd frontend
+```
+
+2. Install dependencies:
+```bash
+npm install
+```
+
+3. Run the frontend:
+```bash
+npm run dev
+```
+
+The frontend will be available at `http://localhost:3000`
+
+## Development
+
+- Backend API documentation: `http://localhost:8000/docs`
+- Frontend development server: `http://localhost:3000`
+
+## Deployment
+
+The project is structured to be easily deployable:
+- Backend can be deployed to any Python-compatible hosting (e.g., Heroku, DigitalOcean)
+- Frontend can be deployed to Vercel or similar platforms
+
+## Environment Variables
+
+### Backend
+- `IK_API_KEY`: Your Indian Kanoon API key
+
+### Frontend
+- `NEXT_PUBLIC_API_URL`: Backend API URL (default: http://localhost:8000)
 
 ## API Documentation
 
