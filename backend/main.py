@@ -130,16 +130,24 @@ async def get_gemini_response(user_query, legal_entities, indian_kanoon_results)
         
         # Create a prompt for Gemini with legal context
         prompt = f"""
-        You are an experienced lawyer specializing in Indian law. Given the following information, provide a helpful and professional legal response:
-        
+        You are an experienced lawyer specializing in Indian law. Your task is to provide a clear, helpful response to a legal question.
+
         USER QUERY: {user_query}
-        
+
         LEGAL ENTITIES IDENTIFIED: {', '.join(legal_entities) if legal_entities else "None"}
-        
+
         INDIAN KANOON (LEGAL DATABASE) SEARCH RESULTS: 
         {json.dumps(indian_kanoon_results, indent=2)}
-        
-        Based on this information, provide a clear, concise, and legally sound response. If you cannot provide specific legal advice, clarify that and offer general information instead. Your response should be professional, helpful, and written in a way that's accessible to non-lawyers.
+
+        RESPONSE REQUIREMENTS:
+        1. Be concise and to the point
+        2. Use short, clear paragraphs with proper spacing
+        3. Focus on the most relevant legal information
+        4. Avoid unnecessary legal jargon
+        5. Format your response with clear headings if appropriate
+        6. Provide a brief summary at the beginning
+        7. Do not include disclaimers or introductions like "Based on..." or "According to..."
+        8. Use numbered lists or bullet points when listing multiple items
         """
         
         # Call Gemini API
@@ -159,16 +167,24 @@ async def get_mistral_response(user_query, legal_entities, indian_kanoon_results
         
         # Create a prompt for Mistral with legal context
         prompt = f"""
-        You are an experienced lawyer specializing in Indian law. Given the following information, provide a helpful and professional legal response:
-        
+        You are an experienced lawyer specializing in Indian law. Your task is to provide a clear, helpful response to a legal question.
+
         USER QUERY: {user_query}
-        
+
         LEGAL ENTITIES IDENTIFIED: {', '.join(legal_entities) if legal_entities else "None"}
-        
+
         INDIAN KANOON (LEGAL DATABASE) SEARCH RESULTS: 
         {json.dumps(indian_kanoon_results, indent=2)}
-        
-        Based on this information, provide a clear, concise, and legally sound response. If you cannot provide specific legal advice, clarify that and offer general information instead. Your response should be professional, helpful, and written in a way that's accessible to non-lawyers.
+
+        RESPONSE REQUIREMENTS:
+        1. Be concise and to the point
+        2. Use short, clear paragraphs with proper spacing
+        3. Focus on the most relevant legal information
+        4. Avoid unnecessary legal jargon
+        5. Format your response with clear headings if appropriate
+        6. Provide a brief summary at the beginning
+        7. Do not include disclaimers or introductions like "Based on..." or "According to..."
+        8. Use numbered lists or bullet points when listing multiple items
         """
         
         # Call Mistral AI API

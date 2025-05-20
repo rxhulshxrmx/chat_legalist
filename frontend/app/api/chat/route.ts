@@ -7,6 +7,14 @@ const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:8000';
 
 export const runtime = 'edge';
 
+// Helper function to clean response text
+function formatResponse(text: string): string {
+  // Remove excessive whitespace while preserving paragraph breaks
+  return text
+    .replace(/\n{3,}/g, '\n\n')  // Replace 3+ consecutive newlines with just 2
+    .trim();  // Remove leading/trailing whitespace
+}
+
 export async function POST(req: NextRequest) {
   try {
     // Parse request body
@@ -35,10 +43,11 @@ export async function POST(req: NextRequest) {
     
     if (backendData.response) {
       const lawyerResponse = backendData.response.lawyer_response;
+      const modelUsed = backendData.response.model_used || 'unknown';
       
-      // If we have a lawyer response from Gemini, use that
+      // If we have a lawyer response, use that
       if (lawyerResponse) {
-        responseText = lawyerResponse;
+        responseText = formatResponse(lawyerResponse);
       } else {
         // Fallback to raw data format if no lawyer response
         const entities = backendData.response.extracted_legal_entities || [];

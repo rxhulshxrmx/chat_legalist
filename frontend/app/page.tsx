@@ -305,8 +305,8 @@ export default function Home() {
                   {message.role === "assistant" ? <BotIcon /> : <UserIcon />}
                 </div>
 
-                <div className="flex flex-col gap-1">
-                  <div className="text-zinc-800 dark:text-zinc-300 flex flex-col gap-4">
+                <div className="flex flex-col gap-2">
+                  <div className="text-zinc-800 dark:text-zinc-300 flex flex-col gap-4 leading-relaxed">
                     <Markdown>{message.content}</Markdown>
                   </div>
                   <div className="flex flex-row gap-2">
