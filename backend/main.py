@@ -8,6 +8,7 @@ import os
 import logging
 import google.generativeai as genai
 from mistralai import Mistral
+from dotenv import load_dotenv
 
 # Import the IKApi and FileStorage from the module
 # Make sure your file is named ik_download.py and accessible in the path
@@ -34,6 +35,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Load environment variables
+load_dotenv()
 
 # --- Initialize Google Gemini API ---
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
@@ -270,5 +274,4 @@ if __name__ == "__main__":
     args = parser.parse_args()
     file_storage = FileStorage(args.datadir)
     ik_api = IKApi(args, file_storage)
-    uvicorn.run(app, host="0.0.0.0", port=8000)
     uvicorn.run(app, host="0.0.0.0", port=8000)

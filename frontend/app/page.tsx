@@ -30,32 +30,30 @@ interface MessageWithAttachments {
   experimental_attachments?: MessageAttachment[];
 }
 
-// Add model toggle component
+// Small model toggle component for top right corner
 function ModelToggle({ currentModel, onChange }: { currentModel: string, onChange: (model: string) => void }) {
   return (
-    <div className="flex items-center justify-center mb-4 w-full">
-      <div className="bg-zinc-100 dark:bg-zinc-800 rounded-full p-1 flex items-center">
-        <button
-          onClick={() => onChange("mistral")}
-          className={`px-3 py-1 rounded-full transition-all ${
-            currentModel === "mistral" 
-              ? "bg-white dark:bg-zinc-700 shadow-sm" 
-              : "text-zinc-500 dark:text-zinc-400"
-          }`}
-        >
-          Mistral AI
-        </button>
-        <button
-          onClick={() => onChange("gemini")}
-          className={`px-3 py-1 rounded-full transition-all ${
-            currentModel === "gemini" 
-              ? "bg-white dark:bg-zinc-700 shadow-sm" 
-              : "text-zinc-500 dark:text-zinc-400"
-          }`}
-        >
-          Google Gemini
-        </button>
-      </div>
+    <div className="bg-zinc-100 dark:bg-zinc-800 rounded-full p-0.5 flex items-center text-xs">
+      <button
+        onClick={() => onChange("mistral")}
+        className={`px-2 py-0.5 rounded-full transition-all ${
+          currentModel === "mistral" 
+            ? "bg-white dark:bg-zinc-700 shadow-sm" 
+            : "text-zinc-500 dark:text-zinc-400"
+        }`}
+      >
+        M
+      </button>
+      <button
+        onClick={() => onChange("gemini")}
+        className={`px-2 py-0.5 rounded-full transition-all ${
+          currentModel === "gemini" 
+            ? "bg-white dark:bg-zinc-700 shadow-sm" 
+            : "text-zinc-500 dark:text-zinc-400"
+        }`}
+      >
+        G
+      </button>
     </div>
   );
 }
@@ -270,6 +268,11 @@ export default function Home() {
     >
       {debugInfo && <DebugInfo errorState={debugInfo} />}
       
+      {/* Model Toggle in Top Right */}
+      <div className="absolute top-4 right-4 z-10">
+        <ModelToggle currentModel={modelPreference} onChange={handleModelChange} />
+      </div>
+      
       <AnimatePresence>
         {isDragging && (
           <motion.div
@@ -287,10 +290,6 @@ export default function Home() {
       </AnimatePresence>
 
       <div className="flex flex-col items-center justify-between h-full w-full max-w-3xl mx-auto">
-        <div className="w-full pt-6 px-4">
-          <ModelToggle currentModel={modelPreference} onChange={handleModelChange} />
-        </div>
-
         {messages.length > 0 ? (
           <div className="flex flex-col gap-2 h-full w-dvw items-center overflow-y-scroll">
             {messages.map((message, index) => (
