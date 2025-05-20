@@ -35,9 +35,18 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 3. Install dependencies:
 ```bash
 pip install -r requirements.txt
+pip install google-generativeai
 ```
 
-4. Run the backend:
+4. Set up your Google Gemini API key:
+   - Get an API key from [Google AI Studio](https://makersuite.google.com/)
+   - Edit the `set_gemini_key.sh` file and replace `YOUR_GEMINI_API_KEY` with your actual API key
+   - Run the script to set the environment variable:
+   ```bash
+   source set_gemini_key.sh
+   ```
+
+5. Run the backend:
 ```bash
 uvicorn main:app --reload
 ```
@@ -55,7 +64,12 @@ cd frontend
 npm install
 ```
 
-3. Run the frontend:
+3. Create a `.env.local` file in the frontend directory:
+```
+BACKEND_URL=http://localhost:8000
+```
+
+4. Start the frontend:
 ```bash
 npm run dev
 ```
@@ -99,4 +113,20 @@ Once the server is running, you can access:
 - `database/`: Database models and connection logic
 - `search/`: Semantic search implementation
 - `models/`: Data models and schemas
-- `main.py`: Application entry point 
+- `main.py`: Application entry point
+
+## How It Works
+
+1. The user submits a legal query through the chat interface
+2. The backend performs NER to extract legal entities from the query
+3. The backend searches the Indian Kanoon database using the extracted entities
+4. The backend sends the user query, extracted entities, and search results to Google Gemini
+5. Gemini analyzes this information and generates a professional legal response
+6. The response is returned to the frontend and displayed to the user
+
+## Features
+
+- Legal entity extraction using NER
+- Integration with Indian Kanoon legal database
+- AI-powered legal responses from Google Gemini
+- Real-time chat interface 

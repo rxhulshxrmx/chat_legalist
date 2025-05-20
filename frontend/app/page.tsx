@@ -39,18 +39,48 @@ function TextFilePreview({ file }: { file: File }) {
   );
 }
 
+// Debug component to display errors
+function DebugInfo({ errorState }: { errorState: any }) {
+  return (
+    <div className="fixed bottom-4 right-4 bg-red-100 dark:bg-red-900 p-3 rounded-md max-w-md max-h-72 overflow-auto z-50">
+      <h3 className="font-bold">Debug Info:</h3>
+      <pre className="text-xs mt-2">
+        {JSON.stringify(errorState, null, 2)}
+      </pre>
+    </div>
+  );
+}
+
 export default function Home() {
-  const { messages, input, handleSubmit, handleInputChange, isLoading } =
+  const [debugInfo, setDebugInfo] = useState<any>(null);
+  
+  const { messages, input, handleSubmit, handleInputChange, isLoading, error } =
     useChat({
       api: '/api/chat',
       onError: (error) => {
         console.error('Chat error:', error);
+        setDebugInfo(error);
         toast.error(error.message || 'Failed to get response from the server');
       },
       onResponse: (response) => {
-        console.log('Chat response:', response);
+        if (!response.ok) {
+          response.text().then(text => {
+            console.error('Response error:', text);
+            setDebugInfo({ responseError: text, status: response.status });
+          });
+        } else {
+          console.log('Chat response status:', response.status);
+        }
       }
     });
+
+  // Show error in toast if it exists
+  useEffect(() => {
+    if (error) {
+      toast.error(error.message || 'An error occurred');
+      setDebugInfo(error);
+    }
+  }, [error]);
 
   const [files, setFiles] = useState<FileList | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -156,6 +186,8 @@ export default function Home() {
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
     >
+      {debugInfo && <DebugInfo errorState={debugInfo} />}
+      
       <AnimatePresence>
         {isDragging && (
           <motion.div
