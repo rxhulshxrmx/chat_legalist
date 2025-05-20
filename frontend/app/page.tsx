@@ -14,6 +14,52 @@ import { toast } from "sonner";
 import Link from "next/link";
 import { Markdown } from "@/components/markdown";
 
+// Define extended interfaces for the Message type to support attachments
+interface MessageAttachment {
+  name: string;
+  type: string;
+  content: string;
+  data?: File;
+}
+
+interface MessageWithAttachments {
+  id: string;
+  role: string;
+  content: string;
+  createdAt?: Date;
+  experimental_attachments?: MessageAttachment[];
+}
+
+// Add model toggle component
+function ModelToggle({ currentModel, onChange }: { currentModel: string, onChange: (model: string) => void }) {
+  return (
+    <div className="flex items-center justify-center mb-4 w-full">
+      <div className="bg-zinc-100 dark:bg-zinc-800 rounded-full p-1 flex items-center">
+        <button
+          onClick={() => onChange("mistral")}
+          className={`px-3 py-1 rounded-full transition-all ${
+            currentModel === "mistral" 
+              ? "bg-white dark:bg-zinc-700 shadow-sm" 
+              : "text-zinc-500 dark:text-zinc-400"
+          }`}
+        >
+          Mistral AI
+        </button>
+        <button
+          onClick={() => onChange("gemini")}
+          className={`px-3 py-1 rounded-full transition-all ${
+            currentModel === "gemini" 
+              ? "bg-white dark:bg-zinc-700 shadow-sm" 
+              : "text-zinc-500 dark:text-zinc-400"
+          }`}
+        >
+          Google Gemini
+        </button>
+      </div>
+    </div>
+  );
+}
+
 const getTextFromDataUrl = (dataUrl: string) => {
   const base64 = dataUrl.split(",")[1];
   return window.atob(base64);
@@ -53,6 +99,42 @@ function DebugInfo({ errorState }: { errorState: any }) {
 
 export default function Home() {
   const [debugInfo, setDebugInfo] = useState<any>(null);
+  const [modelPreference, setModelPreference] = useState<string>("mistral");
+  
+  // Get current model preference on initial load
+  useEffect(() => {
+    fetch('/api/model-preference')
+      .then(res => res.json())
+      .then(data => {
+        setModelPreference(data.model);
+      })
+      .catch(err => {
+        console.error('Error fetching model preference:', err);
+      });
+  }, []);
+  
+  // Handle model toggle
+  const handleModelChange = async (model: string) => {
+    try {
+      const response = await fetch('/api/model-preference', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ model }),
+      });
+      
+      if (response.ok) {
+        setModelPreference(model);
+        toast.success(`Switched to ${model === 'mistral' ? 'Mistral AI' : 'Google Gemini'}`);
+      } else {
+        toast.error('Failed to switch AI model');
+      }
+    } catch (error) {
+      console.error('Error changing model preference:', error);
+      toast.error('Failed to switch AI model');
+    }
+  };
   
   const { messages, input, handleSubmit, handleInputChange, isLoading, error } =
     useChat({
@@ -181,7 +263,7 @@ export default function Home() {
 
   return (
     <div
-      className="flex flex-row justify-center pb-20 h-dvh bg-white dark:bg-zinc-900"
+      className="flex flex-col justify-center pb-20 h-dvh bg-white dark:bg-zinc-900"
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
@@ -204,7 +286,11 @@ export default function Home() {
         )}
       </AnimatePresence>
 
-      <div className="flex flex-col justify-between gap-4">
+      <div className="flex flex-col items-center justify-between h-full w-full max-w-3xl mx-auto">
+        <div className="w-full pt-6 px-4">
+          <ModelToggle currentModel={modelPreference} onChange={handleModelChange} />
+        </div>
+
         {messages.length > 0 ? (
           <div className="flex flex-col gap-2 h-full w-dvw items-center overflow-y-scroll">
             {messages.map((message, index) => (

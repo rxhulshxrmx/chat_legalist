@@ -91,8 +91,32 @@ except Exception as e:
     logger.error(f"Failed to load NER model: {str(e)}")
     raise
 
+# Default model preference (can be "mistral" or "gemini")
+MODEL_PREFERENCE = "mistral"
+
 class ChatQuery(BaseModel):
     query: str
+
+class ModelPreference(BaseModel):
+    model: str  # "mistral" or "gemini"
+
+@app.post("/set-model-preference")
+async def set_model_preference(preference: ModelPreference):
+    """Set the preferred AI model to use for responses."""
+    global MODEL_PREFERENCE
+    
+    if preference.model not in ["mistral", "gemini"]:
+        raise HTTPException(status_code=400, detail="Invalid model preference. Must be 'mistral' or 'gemini'")
+    
+    MODEL_PREFERENCE = preference.model
+    logger.info(f"Model preference set to: {MODEL_PREFERENCE}")
+    
+    return {"message": f"Model preference set to {MODEL_PREFERENCE}"}
+
+@app.get("/get-model-preference")
+async def get_model_preference():
+    """Get the current preferred AI model."""
+    return {"model": MODEL_PREFERENCE}
 
 # Function to get Gemini response using legal context
 async def get_gemini_response(user_query, legal_entities, indian_kanoon_results):
@@ -190,25 +214,43 @@ async def chat(chat_query: ChatQuery):
             logger.info("No relevant entities found to search Indian Kanoon")
             indian_kanoon_results = {"message": "No relevant entities found to search Indian Kanoon."}
         
-        # Try Mistral AI first, fall back to Gemini if not available
-        if mistral_client:
+        # Use the preferred model (with fallbacks)
+        lawyer_response = None
+        model_used = None
+        
+        if MODEL_PREFERENCE == "mistral" and mistral_client:
             logger.info("Using Mistral AI for response generation")
             ai_response = await get_mistral_response(user_query, extracted_entities, indian_kanoon_results)
             lawyer_response = ai_response["response"]
-        elif GEMINI_API_KEY:
+            model_used = "mistral"
+        elif MODEL_PREFERENCE == "gemini" and GEMINI_API_KEY:
             logger.info("Using Google Gemini for response generation")
             gemini_response = await get_gemini_response(user_query, extracted_entities, indian_kanoon_results)
             lawyer_response = gemini_response["gemini_response"]
+            model_used = "gemini"
+        # Fallback options if preferred model isn't available
+        elif mistral_client:
+            logger.info("Preferred model not available, falling back to Mistral AI")
+            ai_response = await get_mistral_response(user_query, extracted_entities, indian_kanoon_results)
+            lawyer_response = ai_response["response"]
+            model_used = "mistral"
+        elif GEMINI_API_KEY:
+            logger.info("Preferred model not available, falling back to Google Gemini")
+            gemini_response = await get_gemini_response(user_query, extracted_entities, indian_kanoon_results)
+            lawyer_response = gemini_response["gemini_response"]
+            model_used = "gemini"
         else:
             logger.warning("No AI service available")
             lawyer_response = "No AI service is configured. Please set either MISTRAL_API_KEY or GEMINI_API_KEY."
+            model_used = "none"
         
         # Build response with all information
         overall_message = {
             "user_query": user_query,
             "extracted_legal_entities": extracted_entities,
             "indian_kanoon_results": indian_kanoon_results,
-            "lawyer_response": lawyer_response
+            "lawyer_response": lawyer_response,
+            "model_used": model_used
         }
         
         return {"response": overall_message}
@@ -228,4 +270,5 @@ if __name__ == "__main__":
     args = parser.parse_args()
     file_storage = FileStorage(args.datadir)
     ik_api = IKApi(args, file_storage)
+    uvicorn.run(app, host="0.0.0.0", port=8000)
     uvicorn.run(app, host="0.0.0.0", port=8000)
