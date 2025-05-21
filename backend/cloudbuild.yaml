@@ -20,9 +20,12 @@ steps:
       - '--allow-unauthenticated'
       - '--memory=4Gi'
       - '--cpu=2'
+      - '--timeout=3600'
+      - '--min-instances=1'
+      - '--max-instances=1'
       - '--set-env-vars=MISTRAL_API_KEY=zSTy6et5Rw0Dzmv19dCnDz5R6s6Zx4G5,GEMINI_API_KEY=AIzaSyCh_tJ-cnhnJIW_fUZ3BOcXnlBraoL_ClI'
 
 images:
   - 'gcr.io/$PROJECT_ID/legal-assistant-backend:v1'
 
-timeout: 1800s 
+timeout: 3600s 

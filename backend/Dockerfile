@@ -22,8 +22,11 @@ COPY . .
 # Create storage directory for Indian Kanoon cache
 RUN mkdir -p ./indian_kanoon_cache
 
+# Default port
+ENV PORT=8080
+
 # Expose the port the app runs on
-EXPOSE 8080
+EXPOSE ${PORT}
 
 # Command to run the application
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080"]
+CMD exec uvicorn main:app --host 0.0.0.0 --port ${PORT}
