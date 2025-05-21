@@ -30,34 +30,23 @@ Code Legalist combines cutting-edge AI technology with extensive legal databases
 
 ## System Architecture
 ```mermaid
-flowchart TD
-    subgraph User["User Interface"]
-        A[User Query] --> B[Next.js Frontend]
+flowchart LR
+    User[User] --> Frontend[Next.js Frontend]
+    Frontend --> Backend[FastAPI Backend]
+    
+    subgraph AI[AI Processing]
+        Backend --> NER[Entity Recognition]
+        NER --> LLM[AI Models]
+        LLM --> Response[Response Generation]
     end
     
-    subgraph Processing["Processing Pipeline"]
-        B --> C[FastAPI Backend]
-        C --> D[Query Parser]
-        D --> E[Named Entity Recognition]
-        E --> F[Legal Entity Extraction]
-        F --> G[Indian Kanoon API]
-        G --> H[Query Enhancement]
-        H --> I[Context Integration]
+    subgraph DB[Legal Sources]
+        IK[Indian Kanoon]
+        Laws[Legal Database]
     end
     
-    subgraph LLM["LLM Processing"]
-        I --> J[Enhanced Query]
-        J --> K[AI Models]
-        K --> L[Legal Response]
-    end
-    
-    L --> M[Response Formatting]
-    M --> B
-    
-    subgraph DataStores["Knowledge Sources"]
-        N[(Legal Database)] -.-> F
-        G -.-> O[(Indian Kanoon)]
-    end
+    Backend --> DB
+    Response --> Frontend
 ```
 
 ## Technical Stack
