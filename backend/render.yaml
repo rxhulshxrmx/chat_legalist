@@ -4,7 +4,7 @@ services:
     runtime: python
     plan: free
     pythonVersion: 3.10.0
-    buildCommand: pip install -r requirements.txt
+    buildCommand: pip install numpy==1.24.3 && pip install -r requirements.txt
     startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: IK_API_KEY
@@ -13,4 +13,9 @@ services:
         value: zSTy6et5Rw0Dzmv19dCnDz5R6s6Zx4G5
       - key: GEMINI_API_KEY
         value: AIzaSyCh_tJ-cnhnJIW_fUZ3BOcXnlBraoL_ClI
-    autoDeploy: true 
+    autoDeploy: true
+    scaling:
+      minInstances: 1
+      maxInstances: 1
+    resources:
+      memory: 1024Mi 

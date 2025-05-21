@@ -6,7 +6,7 @@ python-dotenv==1.0.1
 google-generativeai==0.3.2
 mistralai==1.7.0
 transformers==4.38.2
-torch==2.2.1 --index-url https://download.pytorch.org/whl/cpu
---extra-index-url https://download.pytorch.org/whl/cu118
-sentencepiece==0.1.99; sys_platform != 'linux' or python_version < '3.12'
+torch==2.2.1+cpu --index-url https://download.pytorch.org/whl/cpu
+numpy==1.24.3
+sentencepiece==0.1.99
 protobuf==3.20.3
