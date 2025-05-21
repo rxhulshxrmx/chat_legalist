@@ -33,10 +33,11 @@ Code Legalist combines cutting-edge AI technology with extensive legal databases
 flowchart LR
     User[User] --> Frontend[Next.js Frontend]
     Frontend --> Backend[FastAPI Backend]
+    Backend --> NER[Entity Recognition]
     
     subgraph AI[AI Processing]
-        Backend --> NER[Entity Recognition]
-        NER --> LLM[AI Models]
+        NER --> DB
+        DB --> LLM[AI Models]
         LLM --> Response[Response Generation]
     end
     
@@ -45,7 +46,6 @@ flowchart LR
         Laws[Legal Database]
     end
     
-    Backend --> DB
     Response --> Frontend
 ```
 
