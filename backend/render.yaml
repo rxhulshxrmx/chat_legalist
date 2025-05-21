@@ -9,4 +9,8 @@ services:
     envVars:
       - key: IK_API_KEY
         sync: false
+      - key: MISTRAL_API_KEY
+        value: zSTy6et5Rw0Dzmv19dCnDz5R6s6Zx4G5
+      - key: GEMINI_API_KEY
+        value: AIzaSyCh_tJ-cnhnJIW_fUZ3BOcXnlBraoL_ClI
     autoDeploy: true 
