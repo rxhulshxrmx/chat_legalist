@@ -1,4 +1,4 @@
-# Code Legalist
+# Chat Legalist
 
 A sophisticated legal assistant platform designed to help users understand Indian laws and legal concepts through advanced AI models and comprehensive legal databases.
 
