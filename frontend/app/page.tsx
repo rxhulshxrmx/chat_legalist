@@ -8,7 +8,7 @@ import {
   VercelIcon,
 } from "@/components/icons";
 import { useChat } from "ai/react";
-import { DragEvent, useEffect, useRef, useState } from "react";
+import { DragEvent, useEffect, useRef, useState, FormEvent } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { toast } from "sonner";
 import Link from "next/link";
@@ -98,6 +98,7 @@ function DebugInfo({ errorState }: { errorState: any }) {
 export default function Home() {
   const [debugInfo, setDebugInfo] = useState<any>(null);
   const [modelPreference, setModelPreference] = useState<string>("mistral");
+  const [isLoading, setIsLoading] = useState(false);
   
   // Get current model preference on initial load
   useEffect(() => {
@@ -134,33 +135,26 @@ export default function Home() {
     }
   };
   
-  const { messages, input, handleSubmit, handleInputChange, isLoading, error } =
-    useChat({
-      api: '/api/chat',
-      onError: (error) => {
-        console.error('Chat error:', error);
-        setDebugInfo(error);
-        toast.error(error.message || 'Failed to get response from the server');
-      },
-      onResponse: (response) => {
-        if (!response.ok) {
-          response.text().then(text => {
-            console.error('Response error:', text);
-            setDebugInfo({ responseError: text, status: response.status });
-          });
-        } else {
-          console.log('Chat response status:', response.status);
-        }
+  const { messages, input, handleInputChange, handleSubmit } = useChat({
+    api: "/api/chat",
+    onError: (err: Error) => {
+      console.error('Chat error:', err);
+      setDebugInfo(err);
+      toast.error(err.message || 'Failed to get response from the server');
+      setIsLoading(false);
+    },
+    onResponse: (response) => {
+      if (!response.ok) {
+        response.text().then(text => {
+          console.error('Response error:', text);
+          setDebugInfo({ responseError: text, status: response.status });
+        });
+      } else {
+        console.log('Chat response status:', response.status);
       }
-    });
-
-  // Show error in toast if it exists
-  useEffect(() => {
-    if (error) {
-      toast.error(error.message || 'An error occurred');
-      setDebugInfo(error);
+      setIsLoading(false);
     }
-  }, [error]);
+  });
 
   const [files, setFiles] = useState<FileList | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -259,6 +253,12 @@ export default function Home() {
     }
   };
 
+  const handleFormSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsLoading(true);
+    handleSubmit(e);
+  };
+
   return (
     <div
       className="flex flex-col justify-center pb-20 h-dvh bg-white dark:bg-zinc-900"
@@ -310,20 +310,7 @@ export default function Home() {
                     <Markdown>{message.content}</Markdown>
                   </div>
                   <div className="flex flex-row gap-2">
-                    {message.experimental_attachments?.map((attachment) =>
-                      attachment.contentType?.startsWith("image") ? (
-                        <img
-                          className="rounded-md w-40 mb-3"
-                          key={attachment.name}
-                          src={attachment.url}
-                          alt={attachment.name}
-                        />
-                      ) : attachment.contentType?.startsWith("text") ? (
-                        <div className="text-xs w-40 h-24 overflow-hidden text-zinc-400 border p-2 rounded-md dark:bg-zinc-800 dark:border-zinc-700 mb-3">
-                          {getTextFromDataUrl(attachment.url)}
-                        </div>
-                      ) : null
-                    )}
+                    {/* Removed experimental_attachments as it's not supported */}
                   </div>
                 </div>
               </motion.div>
@@ -358,11 +345,7 @@ export default function Home() {
 
         <form
           className="flex flex-col gap-2 relative items-center"
-          onSubmit={(event) => {
-            const options = files ? { experimental_attachments: files } : {};
-            handleSubmit(event, options);
-            setFiles(null);
-          }}
+          onSubmit={handleFormSubmit}
         >
           <AnimatePresence>
             {files && files.length > 0 && (

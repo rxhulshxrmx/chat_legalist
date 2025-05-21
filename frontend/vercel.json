@@ -1,0 +1,9 @@
+{
+  "version": 2,
+  "buildCommand": "npm run build",
+  "installCommand": "npm install",
+  "framework": "nextjs",
+  "env": {
+    "BACKEND_URL": "https://legal-assistant-backend-71781800169.us-central1.run.app"
+  }
+} 

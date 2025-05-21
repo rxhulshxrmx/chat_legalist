@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 origins = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
-    # "your-vercel-app-url.vercel.app",
+    # Add your production domains here
 ]
 
 app.add_middleware(
@@ -57,7 +57,7 @@ else:
     logger.warning("MISTRAL_API_KEY not found. Mistral AI features will be disabled.")
 
 # --- Initialize IK API when FastAPI starts ---
-IK_API_KEY = "18a7742b111567c20f1f9d59e124e61f8740eab2"
+IK_API_KEY = os.environ.get("IK_API_KEY", "") # Get from environment variables
 STORAGE_DIR = "./indian_kanoon_cache"
 
 # Create storage directory if it doesn't exist

@@ -1,32 +1,76 @@
-# Legal Assistant Project
+# Code Legalist - AI-Powered Legal Assistant
 
-A full-stack application for legal information retrieval and assistance.
+An intelligent legal assistant that helps users understand Indian laws and legal concepts using advanced AI models and comprehensive legal databases.
 
-## Project Structure
-
+## Architecture
+```mermaid
+flowchart TD
+    subgraph User["User Interface"]
+        A[User Query] --> B[Next.js Frontend]
+    end
+    
+    subgraph Processing["Processing Pipeline"]
+        B --> C[FastAPI Backend]
+        C --> D[Query Parser]
+        D --> E[Named Entity Recognition]
+        E --> F[Legal Entity Extraction]
+        F --> G[Indian Kanoon API]
+        G --> H[Query Enhancement]
+        H --> I[Context Integration]
+    end
+    
+    subgraph LLM["LLM Processing"]
+        I --> J[Enhanced Query]
+        J --> K[AI Models]
+        K --> L[Legal Response]
+    end
+    
+    L --> M[Response Formatting]
+    M --> B
+    
+    subgraph DataStores["Knowledge Sources"]
+        N[(Legal Database)] -.-> F
+        G -.-> O[(Indian Kanoon)]
+    end
 ```
-.
-├── backend/           # FastAPI backend
-│   ├── main.py       # Main application file
-│   ├── legal_ner.py  # Legal NER implementation
-│   ├── ik_download.py # Indian Kanoon API integration
-│   └── requirements.txt
-│
-└── frontend/         # Next.js frontend
-    ├── app/         # Next.js app directory
-    ├── public/      # Static files
-    └── package.json # Frontend dependencies
-```
+
+## Features
+
+- 🤖 Dual AI Model Support (Mistral & Google Gemini)
+- 📚 Indian Legal Database Integration
+- 🔍 Legal Entity Recognition
+- 💬 Real-time Chat Interface
+- 🎨 Modern, Responsive UI
+- 🔄 Model Preference Toggle
+- 📝 Markdown Support
+- ⚡ Fast Response Times
+
+## Tech Stack
+
+### Frontend
+- Next.js 14
+- React 18
+- TailwindCSS
+- Framer Motion
+- Vercel AI SDK
+
+### Backend
+- FastAPI
+- Python 3.10+
+- Mistral AI
+- Google Gemini
+- Indian Kanoon API Integration
+- Named Entity Recognition
 
 ## Setup
 
 ### Backend Setup
-1. Navigate to the backend directory:
+1. Navigate to backend directory:
 ```bash
 cd backend
 ```
 
-2. Create a virtual environment:
+2. Create and activate virtual environment:
 ```bash
 python -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
@@ -35,26 +79,21 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 3. Install dependencies:
 ```bash
 pip install -r requirements.txt
-pip install google-generativeai
 ```
 
-4. Set up your Google Gemini API key:
-   - Get an API key from [Google AI Studio](https://makersuite.google.com/)
-   - Edit the `set_gemini_key.sh` file and replace `YOUR_GEMINI_API_KEY` with your actual API key
-   - Run the script to set the environment variable:
-   ```bash
-   source set_gemini_key.sh
-   ```
+4. Create .env file:
+```bash
+cp .env.example .env
+# Edit .env with your API keys
+```
 
 5. Run the backend:
 ```bash
 uvicorn main:app --reload
 ```
 
-The backend will be available at `http://localhost:8000`
-
 ### Frontend Setup
-1. Navigate to the frontend directory:
+1. Navigate to frontend directory:
 ```bash
 cd frontend
 ```
@@ -64,69 +103,53 @@ cd frontend
 npm install
 ```
 
-3. Create a `.env.local` file in the frontend directory:
-```
-BACKEND_URL=http://localhost:8000
+3. Create .env.local:
+```bash
+cp .env.example .env.local
+# Edit .env.local with your settings
 ```
 
-4. Start the frontend:
+4. Run the development server:
 ```bash
 npm run dev
 ```
 
-The frontend will be available at `http://localhost:3000`
-
-## Development
-
-- Backend API documentation: `http://localhost:8000/docs`
-- Frontend development server: `http://localhost:3000`
-
-## Deployment
-
-The project is structured to be easily deployable:
-- Backend can be deployed to any Python-compatible hosting (e.g., Heroku, DigitalOcean)
-- Frontend can be deployed to Vercel or similar platforms
-
 ## Environment Variables
 
 ### Backend
-- `IK_API_KEY`: Your Indian Kanoon API key
+- `MISTRAL_API_KEY`: Mistral AI API key
+- `GEMINI_API_KEY`: Google Gemini API key
+- `IK_API_KEY`: Indian Kanoon API key
 
 ### Frontend
-- `NEXT_PUBLIC_API_URL`: Backend API URL (default: http://localhost:8000)
+- `BACKEND_URL`: Backend API URL (default: http://localhost:8000)
+
+## Deployment
+
+### Backend
+- Deployed on Google Cloud Run
+- Configured with 4GB memory and 2 CPU cores
+- Auto-scaling enabled
+
+### Frontend
+- Deployed on Vercel
+- Optimized for edge runtime
+- Configured with environment variables
 
 ## API Documentation
 
-Once the server is running, you can access:
-- Interactive API docs (Swagger UI): `http://localhost:8000/docs`
-- Alternative API docs (ReDoc): `http://localhost:8000/redoc`
+Once the server is running, access:
+- Swagger UI: `http://localhost:8000/docs`
+- ReDoc: `http://localhost:8000/redoc`
 
-## API Endpoints
+## Contributing
 
-- `POST /chat/`: Process legal queries and return relevant information
-  - Request body: `{"query": "your legal question here"}`
-  - Returns processed legal information and relevant case references
+1. Fork the repository
+2. Create your feature branch
+3. Commit your changes
+4. Push to the branch
+5. Create a Pull Request
 
-## Project Structure
+## License
 
-- `api/`: API endpoints and route handlers
-- `database/`: Database models and connection logic
-- `search/`: Semantic search implementation
-- `models/`: Data models and schemas
-- `main.py`: Application entry point
-
-## How It Works
-
-1. The user submits a legal query through the chat interface
-2. The backend performs NER to extract legal entities from the query
-3. The backend searches the Indian Kanoon database using the extracted entities
-4. The backend sends the user query, extracted entities, and search results to Google Gemini
-5. Gemini analyzes this information and generates a professional legal response
-6. The response is returned to the frontend and displayed to the user
-
-## Features
-
-- Legal entity extraction using NER
-- Integration with Indian Kanoon legal database
-- AI-powered legal responses from Google Gemini
-- Real-time chat interface 
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details. 
