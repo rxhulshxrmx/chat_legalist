@@ -19,7 +19,8 @@ steps:
       - '--platform=managed'
       - '--allow-unauthenticated'
       - '--memory=2Gi'
-      - '--set-env-vars=IK_API_KEY=18a7742b111567c20f1f9d59e124e61f8740eab2'
+      # Environment variables should be set through Cloud Run's UI or secret manager
+      - '--set-env-vars=IK_API_KEY=$$IK_API_KEY'
 
 images:
   - 'gcr.io/$PROJECT_ID/legal-assistant-backend:v1'

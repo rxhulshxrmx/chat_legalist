@@ -3,9 +3,10 @@
 # Kill any running uvicorn processes
 pkill -f 'uvicorn main:app'
 
-# Set API keys
-export MISTRAL_API_KEY="zSTy6et5Rw0Dzmv19dCnDz5R6s6Zx4G5"
-export GEMINI_API_KEY="AIzaSyCh_tJ-cnhnJIW_fUZ3BOcXnlBraoL_ClI"
+# Load environment variables from .env file
+if [ -f .env ]; then
+    export $(cat .env | xargs)
+fi
 
-echo "API keys set. Starting FastAPI server..."
+echo "Environment loaded. Starting FastAPI server..."
 uvicorn main:app --reload 
