@@ -1,0 +1,28 @@
+steps:
+  # Build the container image
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'gcr.io/$PROJECT_ID/legal-assistant-backend:v1', '.']
+  
+  # Push the container image to Google Container Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/$PROJECT_ID/legal-assistant-backend:v1']
+  
+  # Deploy container image to Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - 'legal-assistant-backend'
+      - '--image=gcr.io/$PROJECT_ID/legal-assistant-backend:v1'
+      - '--region=us-central1'
+      - '--platform=managed'
+      - '--allow-unauthenticated'
+      - '--memory=4Gi'
+      - '--cpu=2'
+      - '--set-env-vars=MISTRAL_API_KEY=zSTy6et5Rw0Dzmv19dCnDz5R6s6Zx4G5,GEMINI_API_KEY=AIzaSyCh_tJ-cnhnJIW_fUZ3BOcXnlBraoL_ClI'
+
+images:
+  - 'gcr.io/$PROJECT_ID/legal-assistant-backend:v1'
+
+timeout: 1800s 
