@@ -21,7 +21,7 @@ logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-# CORS Configuration
+# CORS Configuration - Add your production domains to the origins list
 origins = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
