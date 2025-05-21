@@ -9,12 +9,22 @@ import logging
 import google.generativeai as genai
 from mistralai import Mistral
 from dotenv import load_dotenv
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
+import re
+from pydantic import validator
+import uuid
+import time
 
 # Import the IKApi and FileStorage from the module
 # Make sure your file is named ik_download.py and accessible in the path
 from ik_download import IKApi, FileStorage, get_arg_parser
 
 app = FastAPI()
+limiter = Limiter(key_func=get_remote_address)
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 # Set up logging
 logging.basicConfig(level=logging.INFO, 
@@ -32,8 +42,10 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["POST", "GET", "OPTIONS"],  # Explicitly specify allowed methods
+    allow_headers=["Content-Type", "Authorization"],  # Explicitly specify allowed headers
+    expose_headers=[],  # Explicitly specify which headers to expose
+    max_age=3600,  # Cache preflight requests for 1 hour
 )
 
 # Load environment variables
@@ -100,6 +112,20 @@ MODEL_PREFERENCE = "mistral"
 
 class ChatQuery(BaseModel):
     query: str
+
+    class Config:
+        min_length = 3
+        max_length = 1000
+
+    @validator('query')
+    def validate_query(cls, v):
+        # Remove any potentially harmful characters
+        v = re.sub(r'[^\w\s\-.,?!]', '', v)
+        if len(v.strip()) < 3:
+            raise ValueError('Query must be at least 3 characters long')
+        if len(v) > 1000:
+            raise ValueError('Query must not exceed 1000 characters')
+        return v.strip()
 
 class ModelPreference(BaseModel):
     model: str  # "mistral" or "gemini"
@@ -205,7 +231,8 @@ async def get_mistral_response(user_query, legal_entities, indian_kanoon_results
 
 @app.post("/chat")
 @app.post("/chat/")
-async def chat(chat_query: ChatQuery):
+@limiter.limit("20/minute")  # Limit to 20 requests per minute per IP
+async def chat(request: Request, chat_query: ChatQuery):
     user_query = chat_query.query
     logger.info(f"User query: {user_query}")
     
@@ -282,6 +309,26 @@ async def chat(chat_query: ChatQuery):
 @app.get("/")
 async def root():
     return {"message": "Legal Assistant API is running!"}
+
+@app.middleware("http")
+async def log_requests(request: Request, call_next):
+    # Generate request ID
+    request_id = str(uuid.uuid4())
+    
+    # Log request details
+    logger.info(f"Request {request_id}: {request.method} {request.url}")
+    logger.info(f"Client IP: {request.client.host}")
+    logger.info(f"Headers: {dict(request.headers)}")
+    
+    # Time the request
+    start_time = time.time()
+    response = await call_next(request)
+    process_time = time.time() - start_time
+    
+    # Log response details
+    logger.info(f"Request {request_id} completed in {process_time:.2f}s with status {response.status_code}")
+    
+    return response
 
 if __name__ == "__main__":
     import argparse
